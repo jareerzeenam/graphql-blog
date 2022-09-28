@@ -1,4 +1,4 @@
-const Blog = require('../models/Blog.model');
+const BlogRepository = require('../repositories/blog-repository');
 
 const blogs = {
   Query: {
@@ -6,15 +6,16 @@ const blogs = {
       return 'Hello World';
     },
     getAllBlogs: async () => {
-      return await Blog.find();
+      const blogRepository = new BlogRepository();
+      const { data } = await blogRepository.findAllBlogs();
+      return data;
     },
   },
 
   Mutation: {
     createBlog: async (_, args) => {
-      const { title, description, author, categoryId } = args.blog;
-      const blog = new Blog({ title, description, author, categoryId });
-      await blog.save();
+      const blogRepository = new BlogRepository();
+      const blog = await blogRepository.create(args.blog);
       return blog;
     },
   },
