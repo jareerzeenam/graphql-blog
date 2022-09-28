@@ -1,18 +1,34 @@
 const { makeExecutableSchema } = require('@graphql-tools/schema');
+const {
+  wrapSchema,
+  RenameTypes,
+  RenameRootFields,
+} = require('@graphql-tools/wrap');
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { resolve } = require('path');
+const { prefix } = require('./config/graphql');
 const typeDefs = require('./typeDefs/index');
 const resolvers = require('./resolvers/index');
 const connectDB = require('./config/db');
+
+// Load config
+require('dotenv').config({ path: resolve(__dirname, './config/.env') });
 
 let schema = makeExecutableSchema({
   typeDefs,
   resolvers,
 });
 
-// Load config
-require('dotenv').config({ path: resolve(__dirname, './config/.env') });
+schema = wrapSchema({
+  schema,
+  transforms: [
+    // Add prefix for Type, excluding Query, Mutation, and Subscription
+    new RenameTypes((name) => `${prefix}${name}`),
+    // Add prefix for Type, excluding Query, Mutation, and Subscription
+    new RenameRootFields((_, fieldName) => `${prefix}${fieldName}`),
+  ],
+});
 
 async function startServer() {
   const app = express();

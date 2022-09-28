@@ -11,7 +11,7 @@ const blogs = {
   },
 
   Mutation: {
-    createBlog: async (parent, args, context, info) => {
+    createBlog: async (_, args) => {
       const { title, description, author, categoryId } = args.blog;
       const blog = new Blog({ title, description, author, categoryId });
       await blog.save();
