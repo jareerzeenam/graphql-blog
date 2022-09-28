@@ -1,8 +1,15 @@
+const { makeExecutableSchema } = require('@graphql-tools/schema');
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { resolve } = require('path');
 const typeDefs = require('./typeDefs');
-const resolvers = require('./resolvers');
+const resolvers = require('./resolvers/index');
+const connectDB = require('./config/db');
+
+let schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+});
 
 // Load config
 require('dotenv').config({ path: resolve(__dirname, './config/.env') });
@@ -10,8 +17,7 @@ require('dotenv').config({ path: resolve(__dirname, './config/.env') });
 async function startServer() {
   const app = express();
   const apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
   });
 
   await apolloServer.start();
@@ -25,7 +31,7 @@ async function startServer() {
   });
 
   //Connect to DB
-  // connectDB();
+  connectDB();
 
   app.listen(process.env.PORT, () =>
     console.log(`Server Started at ${process.env.PORT}`)

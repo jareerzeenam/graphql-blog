@@ -19,3 +19,7 @@ const BlogSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+const Blog = mongoose.model('blog', BlogSchema);
+
+module.exports = Blog;
