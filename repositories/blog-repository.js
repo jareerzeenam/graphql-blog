@@ -22,6 +22,15 @@ class BlogRepository {
     const data = await Blog.find();
     return { data };
   }
+
+  /**
+   * Find Blog
+   *
+   *
+   */
+  async find(id) {
+    return await Blog.findById(id);
+  }
 }
 
 module.exports = BlogRepository;

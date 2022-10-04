@@ -20,6 +20,8 @@ const typeDefs = gql`
     hello: String
     "Gets all the Blogs"
     getAllBlogs: [Blog]
+    "Get single blog by ID"
+    showBlog(blogId: String!): Blog
   }
 
   "Blog Input Fields"

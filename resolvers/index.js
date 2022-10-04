@@ -8,6 +8,7 @@ modules.forEach((module) => {
   allResolvers.push(module);
 });
 
+// stitching
 const resolvers = mergeResolvers(allResolvers);
 
 module.exports = resolvers;

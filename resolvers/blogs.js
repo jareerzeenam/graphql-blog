@@ -10,6 +10,10 @@ const blogs = {
       const { data } = await blogRepository.findAllBlogs();
       return data;
     },
+    showBlog: async (_, { blogId }) => {
+      const blogRepository = new BlogRepository();
+      return await blogRepository.find(blogId);
+    },
   },
 
   Mutation: {
