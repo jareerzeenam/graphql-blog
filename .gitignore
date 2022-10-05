@@ -1,2 +1,9 @@
+# Node artifact files
 /node_modules
+
+# Environment file
 /config/.env
+
+
+# Coverage reports
+.coverage

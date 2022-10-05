@@ -6,14 +6,13 @@ const {
 } = require('@graphql-tools/wrap');
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-const { resolve } = require('path');
 const { prefix } = require('./config/graphql');
 const typeDefs = require('./typeDefs/index');
 const resolvers = require('./resolvers/index');
 const connectDB = require('./config/db');
 
-// Load config
-require('dotenv').config({ path: resolve(__dirname, './config/.env') });
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config/database')[env];
 
 let schema = makeExecutableSchema({
   typeDefs,
@@ -49,8 +48,8 @@ async function startServer() {
   //Connect to DB
   connectDB();
 
-  app.listen(process.env.PORT, () =>
-    console.log(`Server Started at ${process.env.PORT}`)
+  app.listen(config.PORT, () =>
+    console.log(`Server Started at ${config.PORT}`)
   );
 }
 
