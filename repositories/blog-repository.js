@@ -2,9 +2,9 @@ const Blog = require('../models/Blog.model');
 
 class BlogRepository {
   /**
-   * Create a new schedule in database.
+   * Create a new blog in database.
    *
-   * @param {Object} payload - The payload for control schedule.
+   * @param {Object} payload - The payload for blog.
    * @returns {Blog}
    */
   async create(payload) {
@@ -14,7 +14,7 @@ class BlogRepository {
   }
 
   /**
-   * Get All Blogs
+   * Get All Blogs in database.
    *
    * @returns {{data: array}}
    */
@@ -24,9 +24,9 @@ class BlogRepository {
   }
 
   /**
-   * Find Blog
+   * Find a Blog by ID
    *
-   *
+   *  @returns {Blog}
    */
   async find(id) {
     return await Blog.findById(id);
