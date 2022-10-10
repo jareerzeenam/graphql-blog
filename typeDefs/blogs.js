@@ -1,6 +1,21 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+  input PaginationInput {
+    offset: Int!
+    limit: Int!
+  }
+
+  enum SortOrder {
+    ASC
+    DESC
+  }
+
+  input SortInput {
+    fieldName: String!
+    order: SortOrder!
+  }
+
   "Blog Object"
   type Blog {
     "Blog ID"
@@ -15,11 +30,18 @@ const typeDefs = gql`
     categoryId: Int
   }
 
+  type BlogList {
+    data: [Blog]
+    total: Int
+    offset: Int
+    limit: Int
+  }
+
   type Query {
     "Test"
     hello: String
     "Gets all the Blogs"
-    getAllBlogs: [Blog]
+    getAllBlogs(paginate: PaginationInput, sort: SortInput): BlogList
     "Get single blog by ID"
     showBlog(blogId: String!): Blog
   }

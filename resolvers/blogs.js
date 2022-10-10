@@ -5,10 +5,14 @@ const blogs = {
     hello: () => {
       return 'Hello World';
     },
-    getAllBlogs: async () => {
+    getAllBlogs: async (_, { paginate, sort }) => {
       const blogRepository = new BlogRepository();
-      const { data } = await blogRepository.findAllBlogs();
-      return data;
+      const { data, offset, limit, total } = await blogRepository.findAllBlogs(
+        paginate,
+        sort
+      );
+
+      return { data, offset, limit, total };
     },
     showBlog: async (_, { blogId }) => {
       const blogRepository = new BlogRepository();
