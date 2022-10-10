@@ -18,9 +18,24 @@ class BlogRepository {
    *
    * @returns {{data: array}}
    */
-  async findAllBlogs() {
-    const data = await Blog.find();
-    return { data };
+  async findAllBlogs(paginate = [], sort = []) {
+    const params = {};
+
+    const offset = paginate?.offset ?? 0;
+    const limit = paginate?.limit ?? 0;
+
+    if (offset > 0) params.offset = offset;
+    if (limit > 0) params.limit = limit;
+
+    const sortOrder = sort.order;
+
+    const data = await Blog.find()
+      .limit(paginate.limit)
+      .sort({ [sort.fieldName]: sortOrder == 'ASC' ? -1 : 1 });
+
+    const total = await Blog.find(params).count();
+
+    return { data, offset, limit, total };
   }
 
   /**
