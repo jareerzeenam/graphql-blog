@@ -77,4 +77,6 @@ describe('repositories/blog-repository', () => {
       expect(record).toMatchObject(blogData);
     });
   });
+
+  //TODO :: test needed to to handle not existing blog
 });

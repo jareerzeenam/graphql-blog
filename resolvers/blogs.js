@@ -1,10 +1,9 @@
 const BlogRepository = require('../repositories/blog-repository');
+const { sampleFunction } = require('../services/sample-function');
 
 const blogs = {
   Query: {
-    hello: () => {
-      return 'Hello World';
-    },
+    hello: () => sampleFunction(),
     getAllBlogs: async (_, { paginate, sort }) => {
       const blogRepository = new BlogRepository();
       const { data, offset, limit, total } = await blogRepository.findAllBlogs(
