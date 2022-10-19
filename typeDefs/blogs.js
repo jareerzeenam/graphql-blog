@@ -1,35 +1,27 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+  "Pagination Inputs"
   input PaginationInput {
     offset: Int!
     limit: Int!
   }
 
+  "Sort Order Ascending/Descending"
   enum SortOrder {
     ASC
     DESC
   }
 
+  "Sort inputs"
   input SortInput {
     fieldName: String!
     order: SortOrder!
   }
 
-  "Blog Object"
-  type Blog {
-    "Blog ID"
-    id: ID
-    "Blog Title"
-    title: String
-    "Blog Description"
-    description: String
-    "Blog Author Name"
-    author: String
-    "Blog Category"
-    categoryId: Int
-  }
+  # Blog Object is in ./core.js
 
+  "Blog List"
   type BlogList {
     data: [Blog]
     total: Int
@@ -37,6 +29,7 @@ const typeDefs = gql`
     limit: Int
   }
 
+  "Blog Queries"
   type Query {
     "Test"
     hello: String

@@ -49,7 +49,7 @@ async function startServer() {
   connectDB();
 
   app.listen(config.PORT, () =>
-    console.log(`Server Started at ${config.PORT}`)
+    console.log(`Server Started at http://localhost:${config.PORT}/graphql 🚀`)
   );
 }
 
