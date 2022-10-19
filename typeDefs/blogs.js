@@ -29,6 +29,7 @@ const typeDefs = gql`
     limit: Int
   }
 
+  "Blog Queries"
   type Query {
     "Test"
     hello: String
