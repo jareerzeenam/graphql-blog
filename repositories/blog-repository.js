@@ -1,4 +1,5 @@
-const Blog = require('../models/Blog.model');
+const ValidationError = require('../errors/ValidationError');
+const { mongoose, Blog } = require('../models/Blog.model');
 
 class BlogRepository {
   /**
@@ -44,7 +45,10 @@ class BlogRepository {
    *  @returns {Blog}
    */
   async find(id) {
-    return await Blog.findById(id);
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new ValidationError('Invalid Blog ID!');
+
+    return await Blog.findById(id).exec();
   }
 }
 
