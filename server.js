@@ -4,6 +4,8 @@ const {
   RenameTypes,
   RenameRootFields,
 } = require('@graphql-tools/wrap');
+const { UserInputError } = require('apollo-server-errors');
+const ValidationError = require('./errors/ValidationError');
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { prefix } = require('./config/graphql');
@@ -33,6 +35,20 @@ async function startServer() {
   const app = express();
   const apolloServer = new ApolloServer({
     schema,
+
+    formatError: (err) => {
+      // Convert ValidationError to UserInputError
+      if (
+        err?.originalError instanceof ValidationError ||
+        err?.originalError?.originalError instanceof ValidationError
+      ) {
+        return new UserInputError(err.message);
+      }
+
+      // Otherwise return the original error. The error can also
+      // be manipulated in other ways, as long as it's returned.
+      return err;
+    },
   });
 
   await apolloServer.start();

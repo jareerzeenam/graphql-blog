@@ -1,5 +1,5 @@
 const BlogRepository = require('../../repositories/blog-repository');
-const Blog = require('../../models/Blog.model');
+const { Blog } = require('../../models/Blog.model');
 const { connectDB, dropDB, dropCollections } = require('../testDbSetup');
 
 const blogData = {
