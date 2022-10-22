@@ -65,7 +65,7 @@ const showBlog = async (payload) => {
   const blogRepository = new BlogRepository();
   const blog = await blogRepository.find(payload);
 
-  if (!blog) throw new ValidationError('Schedule Not Found!');
+  if (!blog) throw new ValidationError('Blog Not Found!');
 
   return blog;
 };
