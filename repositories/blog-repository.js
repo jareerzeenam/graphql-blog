@@ -45,7 +45,7 @@ class BlogRepository {
    *  @returns {Blog}
    */
   async find(id) {
-    if (!mongoose.Types.ObjectId.isValid(id))
+    if (!mongoose?.Types.ObjectId.isValid(id))
       throw new ValidationError('Invalid Blog ID!');
 
     return await Blog.findById(id).exec();
