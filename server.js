@@ -16,6 +16,8 @@ const connectDB = require('./config/db');
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config/database')[env];
 
+const { auth } = require('./middleware/auth');
+
 let schema = makeExecutableSchema({
   typeDefs,
   resolvers,
@@ -33,8 +35,16 @@ schema = wrapSchema({
 
 async function startServer() {
   const app = express();
+
   const apolloServer = new ApolloServer({
     schema,
+    context: ({ req }) => {
+      // Authentication middleware
+      const isAuth = auth(req);
+
+      // Returns {isAuth: bool, userId:Int}
+      return isAuth;
+    },
 
     formatError: (err) => {
       // Convert ValidationError to UserInputError

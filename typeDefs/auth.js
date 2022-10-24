@@ -20,7 +20,6 @@ const typeDefs = gql`
   }
 
   type Query {
-    user(id: ID!): User
     loginUser(loginInput: LoginInput): User
   }
 

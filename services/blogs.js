@@ -1,6 +1,7 @@
 const ValidationError = require('../errors/ValidationError');
 const BlogRepository = require('../repositories/blog-repository');
 const Validator = require('../utils/validator');
+const { ApolloError } = require('apollo-server-errors');
 
 /**
  * Validate the payload for Blog.
@@ -52,12 +53,23 @@ const validateBlog = ({ title, description, author, categoryId }) => {
  * @param {string} payload.categoryId - The Category ID of the Blog.
  */
 const createBlog = async (payload) => {
-  // Validate Use Input
+  if (!payload.isAuth)
+    throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
+
+  // Assign User Id as Author
+  payload.author = payload.userId;
+
+  // Remove userId from payload object
+  delete payload.userId;
+
+  // Validate User Input
   validateBlog(payload);
 
   const blogRepository = new BlogRepository();
   const blog = await blogRepository.create(payload);
+
   return blog;
+
   // TODO :: Error Handle when failed to create Blog
 };
 

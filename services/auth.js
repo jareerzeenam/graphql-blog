@@ -69,7 +69,7 @@ const registerUser = async (payload) => {
       user_id: newUser._id,
       email,
     },
-    'UNSAFE_STRING',
+    process.env.JWT_HASH_TOKEN_KEY,
     {
       expiresIn: '2h',
     }
@@ -77,7 +77,7 @@ const registerUser = async (payload) => {
   newUser.token = token;
 
   // Save user to MongoDB
-  const res = await newUser.save();
+  const res = await newUser.save(); // TODO :: Move save to user repository
   return {
     id: res.id,
     ...res._doc,
@@ -91,7 +91,15 @@ const loginUser = async (payload) => {
   const password = payload.password;
 
   // See first if the user exist with the email
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }); // TODO :: Move find to user repository
+
+  //   Throw error if that user does not exists
+  if (!user) {
+    throw new ApolloError(
+      `User does not exist with the given email of ${email}`,
+      'USER_DOES_NOT_EXISTS'
+    );
+  }
 
   // Check if the entered password equals the encrypted password
   if (user && (await bcrypt.compare(password, user.password))) {
@@ -101,7 +109,7 @@ const loginUser = async (payload) => {
         user_id: user._id,
         email,
       },
-      'UNSAFE_STRING',
+      process.env.JWT_HASH_TOKEN_KEY,
       {
         expiresIn: '2h',
       }

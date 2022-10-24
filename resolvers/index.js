@@ -1,10 +1,10 @@
 const { mergeResolvers } = require('@graphql-tools/merge');
 const blogs = require('./blogs');
-const users = require('./users');
+const auth = require('./auth');
 
 const allResolvers = [];
 
-const modules = [blogs, users];
+const modules = [blogs, auth];
 modules.forEach((module) => {
   allResolvers.push(module);
 });
