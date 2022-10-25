@@ -50,6 +50,32 @@ class BlogRepository {
 
     return await Blog.findById(id).exec();
   }
+
+  async delete(id) {
+    if (!mongoose?.Types.ObjectId.isValid(id))
+      throw new ValidationError('Invalid Blog ID!');
+
+    await Blog.findByIdAndDelete(id);
+  }
+
+  async update(payload) {
+    if (!mongoose?.Types.ObjectId.isValid(payload.id))
+      throw new ValidationError('Invalid Blog ID!');
+
+    const blog = await Blog.findByIdAndUpdate(
+      payload.id,
+      {
+        title: payload.title,
+        description: payload.description,
+        categoryId: payload.categoryId,
+      },
+      {
+        new: true,
+      }
+    );
+
+    return blog;
+  }
 }
 
 module.exports = BlogRepository;
