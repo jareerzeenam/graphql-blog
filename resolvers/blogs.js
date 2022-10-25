@@ -1,9 +1,15 @@
 const { sampleFunction } = require('../services/sample-function');
-const { createBlog, showBlog, getAllBlogs } = require('../services/blogs');
+const {
+  createBlog,
+  showBlog,
+  getAllBlogs,
+  deleteBlog,
+  updateBlog,
+} = require('../services/blogs');
 
 const blogs = {
   Query: {
-    hello: async () => sampleFunction(),
+    hello: () => sampleFunction(),
 
     getAllBlogs: async (_, { paginate, sort }) =>
       getAllBlogs({
@@ -24,9 +30,11 @@ const blogs = {
     createBlog: async (_, { blog }, { isAuth, userId }) =>
       createBlog({ ...blog, isAuth, userId }),
 
-    // TODO :: Mutation to DELETE Blog (Check if the logged user is deleting blogs owned by them)
+    updateBlog: async (_, { id, blog }, { isAuth, userId }) =>
+      updateBlog({ id, ...blog, isAuth, userId }),
 
-    // TODO :: Mutation to UPDATE Blog (Check if the logged user is updating blogs owned by them)
+    deleteBlog: async (_, blogId, { isAuth, userId }) =>
+      deleteBlog({ ...blogId, isAuth, userId }),
   },
 };
 

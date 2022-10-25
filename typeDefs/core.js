@@ -13,6 +13,8 @@ const typeDefs = gql`
     author: String
     "Blog Category"
     categoryId: Int
+    "Blog Created At"
+    createdAt: String
   }
 `;
 
