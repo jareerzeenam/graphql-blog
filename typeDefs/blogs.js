@@ -37,7 +37,7 @@ const typeDefs = gql`
     "Gets all the Blogs"
     getAllBlogs(paginate: PaginationInput, sort: SortInput): BlogList
 
-    "Get single blog by ID"
+    "Get single blog by ID - Authorization Token Required"
     showBlog(blogId: String!): Blog
   }
 
@@ -50,13 +50,13 @@ const typeDefs = gql`
 
   "Create Blog Mutation"
   type Mutation {
-    "Create a new blog"
+    "Create a new blog - Authorization Token Required"
     createBlog(blog: BlogInput): Blog
 
-    "Delete a blog by ID"
+    "Delete a blog by ID - Authorization Token Required"
     deleteBlog(id: ID!): String
 
-    "Update blog"
+    "Update blog - Authorization Token Required"
     updateBlog(id: ID!, blog: BlogInput): Blog
   }
 `;
