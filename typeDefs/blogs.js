@@ -7,7 +7,7 @@ const typeDefs = gql`
     limit: Int!
   }
 
-  "Sort Order Ascending/Descending"
+  "Sort by Ascending or Descending order"
   enum SortOrder {
     ASC
     DESC
@@ -31,10 +31,12 @@ const typeDefs = gql`
 
   "Blog Queries"
   type Query {
-    "Test"
+    "Test Hello World"
     hello: String
+
     "Gets all the Blogs"
     getAllBlogs(paginate: PaginationInput, sort: SortInput): BlogList
+
     "Get single blog by ID"
     showBlog(blogId: String!): Blog
   }
@@ -43,7 +45,6 @@ const typeDefs = gql`
   input BlogInput {
     title: String!
     description: String
-    author: String
     categoryId: Int
   }
 
@@ -51,6 +52,12 @@ const typeDefs = gql`
   type Mutation {
     "Create a new blog"
     createBlog(blog: BlogInput): Blog
+
+    "Delete a blog by ID"
+    deleteBlog(id: ID!): String
+
+    "Update blog"
+    updateBlog(id: ID!, blog: BlogInput): Blog
   }
 `;
 
