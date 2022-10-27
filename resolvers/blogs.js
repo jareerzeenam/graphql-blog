@@ -5,6 +5,7 @@ const {
   getAllBlogs,
   deleteBlog,
   updateBlog,
+  showMyBlogs,
 } = require('../services/blogs');
 
 const blogs = {
@@ -23,7 +24,8 @@ const blogs = {
       return showBlog(blogId);
     },
 
-    // TODO :: Query to get user's blogs (find by author ID)
+    showMyBlogs: (_, { paginate, sort }, { isAuth, userId }) =>
+      showMyBlogs({ paginate, sort, isAuth, userId }),
   },
 
   Mutation: {

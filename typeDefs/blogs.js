@@ -39,6 +39,9 @@ const typeDefs = gql`
 
     "Get single blog by ID - Authorization Token Required"
     showBlog(blogId: String!): Blog
+
+    "Show blogs belongs to the logged user"
+    showMyBlogs(paginate: PaginationInput, sort: SortInput):BlogList
   }
 
   "Blog Input Fields"
