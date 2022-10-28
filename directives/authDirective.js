@@ -42,7 +42,7 @@ const authDirectiveTransformer = (schema, directiveName) => {
           // Throw error if the user is not authorized
           if (!hasAccess && authDirective.roles.length > 0)
             throw new ForbiddenError(
-              'Not Authorized! Only Admins and registered Users are allowed to create Blogs!'
+              'Not Authorized! You are not allowed to do this operation!'
             );
 
           const result = await resolve.call(this, source, args, context, info);

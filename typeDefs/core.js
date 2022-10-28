@@ -7,6 +7,9 @@ const typeDefs = gql`
     roles: [String]
   ) on OBJECT | FIELD_DEFINITION
 
+  "Date Format ISO"
+  scalar ISODate
+
   "Blog Object"
   type Blog {
     "Blog ID"
@@ -20,7 +23,7 @@ const typeDefs = gql`
     "Blog Category"
     categoryId: Int
     "Blog Created At"
-    createdAt: String
+    createdAt: ISODate
   }
 `;
 
