@@ -12,16 +12,19 @@ const { prefix } = require('./config/graphql');
 const typeDefs = require('./typeDefs/index');
 const resolvers = require('./resolvers/index');
 const connectDB = require('./config/db');
+const { auth } = require('./middleware/auth');
+const { authDirectiveTransformer } = require('./directives/authDirective');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config/database')[env];
-
-const { auth } = require('./middleware/auth');
 
 let schema = makeExecutableSchema({
   typeDefs,
   resolvers,
 });
+
+// Custom @auth directive
+schema = authDirectiveTransformer(schema, 'auth');
 
 schema = wrapSchema({
   schema,
