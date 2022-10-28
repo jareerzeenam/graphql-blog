@@ -107,9 +107,9 @@ const showMyBlogs = async (payload) => {
 
   const blogRepository = new BlogRepository();
   const { data, offset, limit, total } = await blogRepository.findByUser(
+    payload.userId,
     payload.paginate,
-    payload.sort,
-    payload.userId
+    payload.sort
   );
   return { data, offset, limit, total };
 };
@@ -154,7 +154,7 @@ const updateBlog = async (payload) => {
 /**
  * Delete Blog by ID.
  *
- * @param {string} payload.blogId - The ID of the blog.
+ * @param {string} payload.id - The ID of the blog.
  *
  */
 const deleteBlog = async (payload) => {
@@ -162,7 +162,7 @@ const deleteBlog = async (payload) => {
     throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
 
   const blogRepository = new BlogRepository();
-  const blog = await blogRepository.find(payload.blogId);
+  const blog = await blogRepository.find(payload.id);
 
   if (!blog) throw new ValidationError('Blog Not Found!');
 
@@ -173,9 +173,9 @@ const deleteBlog = async (payload) => {
       'UNAUTHENTICATED'
     );
 
-  await blogRepository.delete(payload.blogId);
+  const response = await blogRepository.delete(payload.id);
 
-  return 'Blog Deleted Successfully!';
+  return response;
 };
 
 module.exports = {

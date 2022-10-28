@@ -57,7 +57,7 @@ const typeDefs = gql`
     createBlog(blog: BlogInput): Blog @auth(roles: ["User", "Admin"])
 
     "Delete a blog by ID - Authorization Token & Specific Role Required"
-    deleteBlog(id: ID!): String @auth(roles: ["Admin"])
+    deleteBlog(id: ID!): String @auth(roles: ["Admin", "User"])
 
     "Update blog - Authorization Token & Specific Role Required"
     updateBlog(id: ID!, blog: BlogInput): Blog @auth(roles: ["User", "Admin"])

@@ -44,7 +44,7 @@ class BlogRepository {
    *
    * @returns {{data: array}}
    */
-  async findByUser(paginate = [], sort = [], userId) {
+  async findByUser(userId, paginate = [], sort = []) {
     const params = {};
 
     const offset = paginate?.offset ?? 0;
@@ -115,6 +115,8 @@ class BlogRepository {
       throw new ValidationError('Invalid Blog ID!');
 
     await Blog.findByIdAndDelete(id);
+
+    return 'Blog Deleted Successfully!';
   }
 }
 
