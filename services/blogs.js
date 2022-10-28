@@ -101,6 +101,19 @@ const getAllBlogs = async (payload) => {
    */
 };
 
+const showMyBlogs = async (payload) => {
+  if (!payload.isAuth)
+    throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
+
+  const blogRepository = new BlogRepository();
+  const { data, offset, limit, total } = await blogRepository.findByUser(
+    payload.paginate,
+    payload.sort,
+    payload.userId
+  );
+  return { data, offset, limit, total };
+};
+
 /**
  * Update Blog by ID.
  *
@@ -170,6 +183,7 @@ module.exports = {
   createBlog,
   showBlog,
   getAllBlogs,
+  showMyBlogs,
   updateBlog,
   deleteBlog,
 };
