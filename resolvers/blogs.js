@@ -18,11 +18,8 @@ const blogs = {
         sort,
       }),
 
-    showBlog: async (_, { blogId }, req) => {
-      if (!req.isAuth) throw new Error('Unauthenticated!');
-
-      return showBlog(blogId);
-    },
+    showBlog: async (_, id, { isAuth, userId }) =>
+      showBlog({ ...id, isAuth, userId }),
 
     showMyBlogs: (_, { paginate, sort }, { isAuth, userId }) =>
       showMyBlogs({ paginate, sort, isAuth, userId }),
@@ -41,5 +38,3 @@ const blogs = {
 };
 
 module.exports = blogs;
-
-// TODO :: Unit test required for above Queries and Mutations (Out of scope)

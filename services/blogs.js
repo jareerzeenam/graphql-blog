@@ -1,7 +1,7 @@
 const ValidationError = require('../errors/ValidationError');
 const BlogRepository = require('../repositories/blog-repository');
 const Validator = require('../utils/validator');
-const { ApolloError } = require('apollo-server-errors');
+const { ForbiddenError, AuthenticationError } = require('apollo-server-errors');
 
 /**
  * Validate the payload for Blog.
@@ -53,7 +53,9 @@ const validateBlog = ({ title, description, author, categoryId }) => {
  */
 const createBlog = async (payload) => {
   if (!payload.isAuth)
-    throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
+    throw new AuthenticationError(
+      'You are not authorized to perform this action!'
+    );
 
   // Assign User Id as Author
   payload.author = payload.userId;
@@ -79,8 +81,13 @@ const createBlog = async (payload) => {
  *
  */
 const showBlog = async (payload) => {
+  if (!payload.isAuth)
+    throw new AuthenticationError(
+      'You are not authorized to perform this action!'
+    );
+
   const blogRepository = new BlogRepository();
-  const blog = await blogRepository.find(payload);
+  const blog = await blogRepository.find(payload.id);
 
   if (!blog) throw new ValidationError('Blog Not Found!');
 
@@ -103,7 +110,9 @@ const getAllBlogs = async (payload) => {
 
 const showMyBlogs = async (payload) => {
   if (!payload.isAuth)
-    throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
+    throw new AuthenticationError(
+      'You are not authorized to perform this action!'
+    );
 
   const blogRepository = new BlogRepository();
   const { data, offset, limit, total } = await blogRepository.findByUser(
@@ -129,7 +138,9 @@ const showMyBlogs = async (payload) => {
 
 const updateBlog = async (payload) => {
   if (!payload.isAuth)
-    throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
+    throw new AuthenticationError(
+      'You are not authorized to perform this action!'
+    );
 
   const blogRepository = new BlogRepository();
   const blog = await blogRepository.find(payload.id);
@@ -138,10 +149,7 @@ const updateBlog = async (payload) => {
 
   // Check if the blog belongs to the user before deleting
   if (blog.author != payload.userId)
-    throw new ApolloError(
-      'This blog does not belongs to you!',
-      'UNAUTHENTICATED'
-    );
+    throw new ForbiddenError('This blog does not belongs to you!');
 
   // Modify payload object before saving (not requires)
   delete payload.userId;
@@ -159,7 +167,9 @@ const updateBlog = async (payload) => {
  */
 const deleteBlog = async (payload) => {
   if (!payload.isAuth)
-    throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
+    throw new AuthenticationError(
+      'You are not authorized to perform this action!'
+    );
 
   const blogRepository = new BlogRepository();
   const blog = await blogRepository.find(payload.id);
@@ -168,10 +178,7 @@ const deleteBlog = async (payload) => {
 
   // Check if the blog belongs to the user before deleting
   if (blog.author != payload.userId)
-    throw new ApolloError(
-      'This blog does not belongs to you!',
-      'UNAUTHENTICATED'
-    );
+    throw new ForbiddenError('This blog does not belongs to you!');
 
   const response = await blogRepository.delete(payload.id);
 

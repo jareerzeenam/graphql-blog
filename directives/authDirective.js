@@ -28,7 +28,9 @@ const authDirectiveTransformer = (schema, directiveName) => {
         fieldConfig.resolve = async function (source, args, context, info) {
           // throw when there Authorization header is not set
           if (Object.keys(context).length == 0)
-            throw new ForbiddenError('Authorization Required!');
+            throw new ForbiddenError(
+              'You are not authorized to perform this action!'
+            );
 
           // Get user roles from DB
           const roles = await getUserRoles(context);
@@ -42,7 +44,7 @@ const authDirectiveTransformer = (schema, directiveName) => {
           // Throw error if the user is not authorized
           if (!hasAccess && authDirective.roles.length > 0)
             throw new ForbiddenError(
-              'Not Authorized! You are not allowed to do this operation!'
+              'You do not have right permissions to perform this action!'
             );
 
           const result = await resolve.call(this, source, args, context, info);

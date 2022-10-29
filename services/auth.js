@@ -1,6 +1,6 @@
 // registerUser
 const { User } = require('../models/User.model');
-const { ApolloError } = require('apollo-server-errors');
+const { ForbiddenError } = require('apollo-server-errors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Validator = require('../utils/validator');
@@ -47,9 +47,8 @@ const registerUser = async (payload) => {
 
   //   Throw error if that user exists
   if (oldUser) {
-    throw new ApolloError(
-      `A user is already registered with the email ${email}`,
-      'USER_ALREADY_EXISTS'
+    throw new ForbiddenError(
+      `A user is already registered with the email of ${email} please try a different email.`
     );
   }
 
@@ -95,9 +94,8 @@ const loginUser = async (payload) => {
 
   //   Throw error if that user does not exists
   if (!user) {
-    throw new ApolloError(
-      `User does not exist with the given email of ${email}`,
-      'USER_DOES_NOT_EXISTS'
+    throw new ForbiddenError(
+      `User does not exist with the given email of ${email}`
     );
   }
 
@@ -124,7 +122,7 @@ const loginUser = async (payload) => {
     };
   } else {
     // If user doesn't exist, return error
-    throw new ApolloError('Incorrect Password', 'INCORRECT_PASSWORD');
+    throw new ForbiddenError('Incorrect Credentials!');
   }
 };
 
