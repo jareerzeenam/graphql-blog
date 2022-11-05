@@ -1,3 +1,7 @@
+const DataLoader = require('dataloader');
+const { User } = require('../models/User.model');
+const { Blog, mongoose } = require('../models/Blog.model');
+//! DATA LOADER TEST
 const ValidationError = require('../errors/ValidationError');
 const BlogRepository = require('../repositories/blog-repository');
 const Validator = require('../utils/validator');
@@ -185,6 +189,55 @@ const deleteBlog = async (payload) => {
   return response;
 };
 
+// ! Handle N + 1 Problem
+// ! Data Loader Test
+const dataloaderBlogs = async () => {
+  console.log('BLOG called');
+  const data = await Blog.find().limit(20).sort({ createdAt: -1 });
+  return data;
+};
+
+// ! Data Loader Test
+const getBlogOwnerByIds = async (ids) => {
+  // ids.forEach((id) => {
+  //   if (!mongoose?.Types.ObjectId.isValid(id))
+  //     throw new ValidationError('Invalid Blog ID!');
+  // });
+
+  console.log('DATALOADER NEW called', ids);
+
+  const owner = await User.where('_id').in(ids);
+  return owner;
+};
+
+// ! Data Loader Test
+const dataLoader = new DataLoader(getBlogOwnerByIds);
+
+// ! Data Loader Test Get Blog Owner
+/**
+ * ! The dataloader load function will collect all the
+ * ! IDs and send as a single Array ['1','2','3'] to the Dataloader
+ *
+ */
+const owner = async (payload) => {
+  // ! Check Cache
+  // setTimeout(async () => {
+  //   const owner = await dataLoader.load(payload.parent.author).then((res) => {
+  //     console.log('cached res: ', res);
+  //   });
+  // }, 5000);
+
+  console.log('AUTHOR NEW called');
+  const owner = await dataLoader.load(payload.parent.author);
+  if (!owner) {
+    return {
+      id: null,
+      username: null,
+    };
+  }
+  return owner;
+};
+
 module.exports = {
   validateBlog,
   createBlog,
@@ -193,4 +246,6 @@ module.exports = {
   showMyBlogs,
   updateBlog,
   deleteBlog,
+  dataloaderBlogs, //! DATA LOADER TEST
+  owner, //! DATA LOADER TEST
 };

@@ -6,10 +6,19 @@ const {
   deleteBlog,
   updateBlog,
   showMyBlogs,
+  dataloaderBlogs,
+  owner,
 } = require('../services/blogs');
 
 const blogs = {
+  //! DATALOADER TEST
+  Blogs: {
+    owner: async (parent, _) => owner({ parent }),
+  },
   Query: {
+    //! DATALOADER TEST
+    blogs: async () => dataloaderBlogs(),
+
     hello: () => sampleFunction(),
 
     getAllBlogs: async (_, { paginate, sort }) =>
