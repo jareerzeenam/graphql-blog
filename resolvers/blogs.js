@@ -1,3 +1,5 @@
+const DataLoader = require('dataloader');
+const { User } = require('../models/User.model');
 const { sampleFunction } = require('../services/sample-function');
 const {
   createBlog,
@@ -10,6 +12,23 @@ const {
   owner,
 } = require('../services/blogs');
 
+// ! Data Loader Test
+const getBlogOwnerByIds = async (ids) => {
+  // ids.forEach((id) => {
+  //   if (!mongoose?.Types.ObjectId.isValid(id))
+  //     throw new ValidationError('Invalid Blog ID!');
+  // });
+
+  console.log('DATALOADER NEW called', ids);
+
+  const owner = await User.where('_id').in(ids);
+
+  return owner;
+};
+
+// ! Data Loader Test
+const dataLoader = new DataLoader(getBlogOwnerByIds);
+
 const blogs = {
   //! DATALOADER TEST
   Blogs: {
@@ -18,6 +37,22 @@ const blogs = {
   Query: {
     //! DATALOADER TEST
     blogs: async () => dataloaderBlogs(),
+
+    //! DATALOADER TEST
+    showOwner: async (_, { ids }) => {
+      // console.log(`IDS :: ${ids}`);
+
+      const owners = [];
+      await Promise.all(
+        ids.map(async (id) => {
+          console.log('MAP :: ', id);
+          const owner = await dataLoader.load(id);
+          owners.push(owner);
+        })
+      );
+
+      return owners;
+    },
 
     hello: () => sampleFunction(),
 

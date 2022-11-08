@@ -51,6 +51,8 @@ const typeDefs = gql`
     "Test Data loader"
     blogs: [Blogs]
 
+    showOwner(ids: [String]): [Owner]
+
     "Test Hello World"
     hello: String
 

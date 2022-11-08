@@ -193,7 +193,7 @@ const deleteBlog = async (payload) => {
 // ! Data Loader Test
 const dataloaderBlogs = async () => {
   console.log('BLOG called');
-  const data = await Blog.find().limit(20).sort({ createdAt: -1 });
+  const data = await Blog.find().limit(1).sort({ createdAt: -1 });
   return data;
 };
 
