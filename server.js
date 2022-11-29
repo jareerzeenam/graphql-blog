@@ -52,13 +52,6 @@ async function startServer() {
     console.log('DATALOADER Blogs called', userIds);
     const blogs = await Blog.where('author').in(userIds);
 
-    // console.log(
-    //   'MAP ::: ',
-    //   userIds.map((id) => {
-    //     return blogs.find(({ author }) => author === id);
-    //   })
-    // );
-
     // ! GroupBy and map fixed the Promise length issue (Important)
     const groupedById = groupBy((blog) => blog.author, blogs);
     return map((userId) => groupedById[userId], userIds);
