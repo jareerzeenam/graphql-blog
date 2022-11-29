@@ -1,6 +1,14 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+  # // ! Dataloader 2 start
+  type OwnerBlogs {
+    id: ID!
+    username: String!
+    blogs: [Blog]
+  }
+  # // ! Dataloader 2 end
+
   "Pagination Inputs"
   input PaginationInput {
     offset: Int!
@@ -31,6 +39,10 @@ const typeDefs = gql`
 
   "Blog Queries"
   type Query {
+    # //! Dataloader 2 start
+    showOwnerBlogs(ids: [String!]): [OwnerBlogs]
+    # //! Dataloader 2 end
+
     "Test Hello World"
     hello: String
 

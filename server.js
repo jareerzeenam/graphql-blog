@@ -1,3 +1,9 @@
+// ! Dataloader 2 start
+const Dataloader = require('dataloader');
+const { Blog } = require('./models/Blog.model');
+const { User } = require('./models/User.model');
+// ! Dataloader 2 end
+
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const {
   wrapSchema,
@@ -39,11 +45,20 @@ schema = wrapSchema({
 async function startServer() {
   const app = express();
 
+  // !
+  // const getBlogsByUserIds = async (userIds) => {
+  //   const blogs = await Blog.where('author').in(userIds);
+  //   return blogs;
+  // };
+  //!
+
   const apolloServer = new ApolloServer({
     schema,
     context: ({ req }) => {
       // Authentication middleware
       const isAuth = auth(req);
+
+      // const dataloader = new Dataloader(getBlogsByUserIds);
 
       // Returns {isAuth: bool, userId:Int}
       return isAuth;
