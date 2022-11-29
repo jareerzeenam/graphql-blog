@@ -63,7 +63,7 @@ async function startServer() {
     const groupedById = groupBy((blog) => blog.author, blogs);
     return map((userId) => groupedById[userId], userIds);
 
-    return mapped;
+    // return mapped;
   };
 
   // * Case 2
