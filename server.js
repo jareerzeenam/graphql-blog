@@ -1,7 +1,8 @@
 // ! Dataloader 2 start
-const Dataloader = require('dataloader');
+const DataLoader = require('dataloader');
 const { Blog } = require('./models/Blog.model');
 const { User } = require('./models/User.model');
+const { groupBy, map } = require('ramda');
 // ! Dataloader 2 end
 
 const { makeExecutableSchema } = require('@graphql-tools/schema');
@@ -45,12 +46,33 @@ schema = wrapSchema({
 async function startServer() {
   const app = express();
 
-  // !
-  // const getBlogsByUserIds = async (userIds) => {
-  //   const blogs = await Blog.where('author').in(userIds);
-  //   return blogs;
-  // };
-  //!
+  // ! Dataloader 2 start (these functions need to be in services and imported/require here )
+  // * Case 1
+  const getBlogsByUserIds = async (userIds) => {
+    console.log('DATALOADER Blogs called', userIds);
+    const blogs = await Blog.where('author').in(userIds);
+
+    // ! GroupBy and map fixed the Promise length issue (Important)
+    const groupedById = groupBy((blog) => blog.author, blogs);
+    return map((userId) => groupedById[userId], userIds);
+
+    // return blogs;
+  };
+
+  // * Case 2
+  const getBlogOwnerByIds = async (ids) => {
+    console.log('DATALOADER Owner called', ids);
+    const owner = await User.where('_id').in(ids);
+    return owner;
+  };
+
+  // * Case 3
+  const getBlogByIds = async (ids) => {
+    console.log('DATALOADER Blogs called', ids);
+    const blogs = await Blog.where('_id').in(ids);
+    return blogs;
+  };
+  // ! Dataloader 2 end
 
   const apolloServer = new ApolloServer({
     schema,
@@ -58,10 +80,18 @@ async function startServer() {
       // Authentication middleware
       const isAuth = auth(req);
 
-      // const dataloader = new Dataloader(getBlogsByUserIds);
+      // ! Dataloader 2 start
+      const dataloader = {
+        loaders: {
+          ownerBlogsLoader: new DataLoader(getBlogsByUserIds), // * Case 1
+          blogsOwnerLoader: new DataLoader(getBlogOwnerByIds), // * Case 2
+          blogsLoader: new DataLoader(getBlogByIds), // * Case 3
+        },
+      };
+      // ! Dataloader 2 end
 
       // Returns {isAuth: bool, userId:Int}
-      return isAuth;
+      return { isAuth, dataloader };
     },
 
     formatError: (err) => {

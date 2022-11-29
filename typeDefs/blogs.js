@@ -2,10 +2,27 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   # // ! Dataloader 2 start
+  #  // * Case 1
   type OwnerBlogs {
     id: ID!
     username: String!
     blogs: [Blog]
+  }
+
+  # // * Case 2
+  type Owner {
+    id: ID
+    username: String
+  }
+
+  # // * Case 2
+  type Blogs {
+    id: ID
+    title: String
+    description: String
+    author: String
+    categoryId: Int
+    owner: Owner!
   }
   # // ! Dataloader 2 end
 
@@ -40,7 +57,12 @@ const typeDefs = gql`
   "Blog Queries"
   type Query {
     # //! Dataloader 2 start
-    showOwnerBlogs(ids: [String!]): [OwnerBlogs]
+    # // * Case 1
+    showOwnerBlogs(userIds: [String!]): [OwnerBlogs]
+    # // * Case 2
+    showBlogsOwner(blogIds: [String!]): [Blogs]
+    # // * Case 3
+    blogs(ids: [String!]): [Blog]
     # //! Dataloader 2 end
 
     "Test Hello World"

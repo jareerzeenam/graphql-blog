@@ -11,48 +11,58 @@ const {
 // ! Dataloader 2 start
 const { Blog } = require('../models/Blog.model');
 const { User } = require('../models/User.model');
-const DataLoader = require('dataloader');
-// ! Dataloader 2 end
-
-// ! Dataloader 2 start
-const getOwnerBlogsByIds = async (userIds) => {
-  console.log('DATALOADER NEW called', userIds);
-
-  const blogs = await Blog.where('author').in(userIds);
-
-  return blogs;
-};
-// ! Dataloader 2 end
-
-// ! Dataloader 2 start
-const dataLoader = new DataLoader(getOwnerBlogsByIds);
 // ! Dataloader 2 end
 
 const blogs = {
   // ! Dataloader 2 start
+  // * Case 1 Child
   OwnerBlogs: {
-    blogs: async (parent, _) => {
-      console.log('Child Called', parent.id);
+    blogs: async (owner, _, { dataloader }) => {
+      // const blogs = await Blog.where('author').in(owner.id);
+      console.log('Child Blogs Called :: Case 1 (Chile)');
+      const blogs = await dataloader.loaders.ownerBlogsLoader.load(owner.id); // Promise length issue https://github.com/graphql/dataloader#:~:text=There%20are%20a,York%27%20%7D%0A%5D
+      return blogs;
+    },
+  },
 
-      const blog = await dataLoader.load(parent.id);
-
-      return blog;
-
-      // const blogs = await Blog.where('author').in(parent.id);
-      // return blogs;
+  // * Case 2 Child
+  Blogs: {
+    owner: async (blog, _, { dataloader }) => {
+      // const owner = await User.where('_id').in(ids);
+      console.log('Child Owner Called :: Case 2 (Chile)');
+      const owner = await dataloader.loaders.blogsOwnerLoader.load(blog.author);
+      return owner;
     },
   },
   // ! Dataloader 2 end
   Query: {
     // ! Dataloader 2 start
-    showOwnerBlogs: async (_, { ids }) => {
-      // console.log('D', dataloader);
-      // console.log('Parent Called', ids);
-      // const owner = await User.where('_id').in(ids);
-      // return owner;
+    // * Case 1
+    showOwnerBlogs: async (_, { userIds }) => {
+      console.log('Parent showOwnerBlogs Called :: Case 1 (Parent)');
+      const owners = await User.where('_id').in(userIds);
+      return owners;
+    },
 
-      const data = await User.find().limit(1).sort({ createdAt: -1 });
-      return data;
+    // * Case 2
+    showBlogsOwner: async (_, { blogIds }) => {
+      console.log('Parent showBlogsOwner Called :: Case 2 (Parent)');
+      const blogs = await Blog.where('_id').in(blogIds);
+      return blogs;
+    },
+
+    // * Case 3
+    blogs: async (_, { ids }, { dataloader }) => {
+      // const blogs = await Blog.where('_id').in(ids);
+      console.log('Parent blogs Called :: Case 3');
+      const blogs = [];
+      await Promise.all(
+        ids.map((id) => {
+          const blog = dataloader.loaders.blogsLoader.load(id);
+          blogs.push(blog);
+        })
+      );
+      return blogs;
     },
     // ! Dataloader 2 end
 
