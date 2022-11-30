@@ -2,7 +2,6 @@
 const DataLoader = require('dataloader');
 const { Blog } = require('./models/Blog.model');
 const { User } = require('./models/User.model');
-const { groupBy, map } = require('ramda');
 // ! Dataloader 2 end
 
 const { makeExecutableSchema } = require('@graphql-tools/schema');
@@ -52,11 +51,10 @@ async function startServer() {
     console.log('DATALOADER Blogs called', userIds);
     const blogs = await Blog.where('author').in(userIds);
 
-    // ! GroupBy and map fixed the Promise length issue (Important)
-    const groupedById = groupBy((blog) => blog.author, blogs);
-    return map((userId) => groupedById[userId], userIds);
-
-    // return mapped;
+    // ! map the blogs to the user ids (fixed the Promise length issue (Important))
+    return userIds.map((userId) =>
+      blogs.filter((blog) => blog.author === userId)
+    );
   };
 
   // * Case 2
