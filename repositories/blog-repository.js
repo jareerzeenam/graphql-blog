@@ -32,7 +32,8 @@ class BlogRepository {
 
     const data = await Blog.find()
       .limit(paginate.limit)
-      .sort({ [sort.fieldName]: sortOrder == 'ASC' ? -1 : 1 });
+      .sort({ [sort.fieldName]: sortOrder == 'ASC' ? -1 : 1 })
+      .skip(paginate.offset > 0 ? (paginate.offset - 1) * paginate.limit : 0);
 
     const total = await Blog.find(params).count();
 
@@ -59,7 +60,8 @@ class BlogRepository {
       .where('author')
       .equals(userId)
       .limit(paginate.limit)
-      .sort({ [sort.fieldName]: sortOrder == 'ASC' ? -1 : 1 });
+      .sort({ [sort.fieldName]: sortOrder == 'ASC' ? -1 : 1 })
+      .skip(paginate.offset > 0 ? (paginate.offset - 1) * paginate.limit : 0);
 
     const total = await Blog.find(params)
       .where('author')
