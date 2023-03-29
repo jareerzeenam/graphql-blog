@@ -76,7 +76,7 @@ async function startServer() {
     res.send('Hello from express apollo server');
   });
 
-  //Connect to DB
+  // Connect to DB
   connectDB();
 
   app.listen(config.PORT, () =>
