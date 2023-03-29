@@ -89,10 +89,8 @@ const showBlog = async (payload) => {
 
 const getAllBlogs = async (payload) => {
   const blogRepository = new BlogRepository();
-  const { data, offset, limit, total } = await blogRepository.findAllBlogs(
-    payload.paginate,
-    payload.sort
-  );
+  const { data, offset, limit, total } =
+    await blogRepository.findAllBlogs(payload.paginate, payload.sort);
   return { data, offset, limit, total };
 
   /**
@@ -106,11 +104,12 @@ const showMyBlogs = async (payload) => {
     throw new ApolloError('Unauthenticated!', 'UNAUTHENTICATED');
 
   const blogRepository = new BlogRepository();
-  const { data, offset, limit, total } = await blogRepository.findByUser(
-    payload.userId,
-    payload.paginate,
-    payload.sort
-  );
+  const { data, offset, limit, total } =
+    await blogRepository.findByUser(
+      payload.userId,
+      payload.paginate,
+      payload.sort
+    );
   return { data, offset, limit, total };
 };
 
