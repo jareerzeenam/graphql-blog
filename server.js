@@ -13,7 +13,9 @@ const typeDefs = require('./typeDefs/index');
 const resolvers = require('./resolvers/index');
 const connectDB = require('./config/db');
 const { auth } = require('./middleware/auth');
-const { authDirectiveTransformer } = require('./directives/authDirective');
+const {
+  authDirectiveTransformer,
+} = require('./directives/authDirective');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config/database')[env];
@@ -74,11 +76,13 @@ async function startServer() {
     res.send('Hello from express apollo server');
   });
 
-  //Connect to DB
+  // Connect to DB
   connectDB();
 
   app.listen(config.PORT, () =>
-    console.log(`Server Started at http://localhost:${config.PORT}/graphql 🚀`)
+    console.log(
+      `Server Started at http://localhost:${config.PORT}/graphql 🚀`
+    )
   );
 }
 

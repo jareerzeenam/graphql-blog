@@ -3,7 +3,8 @@ const { registerUser, loginUser } = require('../services/auth');
 const users = {
   Query: {
     // Login User
-    loginUser: async (_, { loginInput }) => loginUser({ ...loginInput }),
+    loginUser: async (_, { loginInput }) =>
+      loginUser({ ...loginInput }),
   },
   Mutation: {
     // Register User

@@ -9,13 +9,17 @@ const typeDefs = gql`
 
   "Sort by Ascending or Descending order"
   enum SortOrder {
+    "Order by Ascending order"
     ASC
+    "Order by Descending order"
     DESC
   }
 
   "Sort inputs"
   input SortInput {
+    "Order by entity name"
     fieldName: String!
+    "Select sort type"
     order: SortOrder!
   }
 
@@ -60,7 +64,8 @@ const typeDefs = gql`
     deleteBlog(id: ID!): String @auth(roles: ["Admin", "User"])
 
     "Update blog - Authorization Token & Specific Role Required"
-    updateBlog(id: ID!, blog: BlogInput): Blog @auth(roles: ["User", "Admin"])
+    updateBlog(id: ID!, blog: BlogInput): Blog
+      @auth(roles: ["User", "Admin"])
   }
 `;
 
