@@ -27,6 +27,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongodb-memory-server": "^8.11.5",
     "mongoose": "^6.6.2",
+    "nodemailer": "^6.9.1",
     "validatorjs": "^3.22.1"
   },
   "devDependencies": {

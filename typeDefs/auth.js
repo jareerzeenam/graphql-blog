@@ -9,6 +9,10 @@ const typeDefs = gql`
     token: String
   }
 
+  type Message {
+    message: String
+  }
+
   "Register from inputs"
   input RegisterInput {
     username: String
@@ -25,6 +29,9 @@ const typeDefs = gql`
   type Query {
     "Login User"
     loginUser(loginInput: LoginInput): User
+
+    "Send Reset Email"
+    sendEmail(email: String!): Message
   }
 
   type Mutation {
