@@ -26,17 +26,27 @@ const typeDefs = gql`
     password: String
   }
 
+  "Reset Password inputs"
+  input ResetPasswordInput {
+    email: String
+    token: String
+    newPassword: String
+  }
+
   type Query {
     "Login User"
     loginUser(loginInput: LoginInput): User
 
-    "Send Reset Email"
-    sendEmail(email: String!): Message
+    "Send Reset Password Email"
+    sendResetPasswordEmail(email: String!): Message
   }
 
   type Mutation {
     "Register User"
     registerUser(registerInput: RegisterInput): User
+
+    "Reset Password"
+    resetPassword(resetPasswordInput: ResetPasswordInput): User
   }
 `;
 
