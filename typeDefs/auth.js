@@ -34,9 +34,6 @@ const typeDefs = gql`
   }
 
   type Query {
-    # "Login User"
-    # loginUser(loginInput: LoginInput): User
-
     "Send Reset Password Email"
     sendResetPasswordEmail(email: String!): Message
   }
@@ -50,6 +47,9 @@ const typeDefs = gql`
 
     "Reset Password"
     resetPassword(resetPasswordInput: ResetPasswordInput): User
+
+    "Logout User"
+    logoutUser(logoutInput: LogoutInput): Message
   }
 `;
 
