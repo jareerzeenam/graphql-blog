@@ -7,10 +7,6 @@ const {
 
 const users = {
   Query: {
-    // Login User
-    loginUser: async (_, { loginInput }) =>
-      loginUser({ ...loginInput }),
-
     // Send Reset Password Email
     sendResetPasswordEmail: async (_, { email }) =>
       sendResetPasswordEmail(email),
@@ -19,6 +15,10 @@ const users = {
     // Register User
     registerUser: async (_, { registerInput }) =>
       registerUser({ ...registerInput }),
+
+    // Login User
+    loginUser: async (_, { loginInput }) =>
+      loginUser({ ...loginInput }),
 
     // Reset Password
     resetPassword: async (_, { resetPasswordInput }) =>

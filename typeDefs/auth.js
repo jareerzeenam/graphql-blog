@@ -34,8 +34,8 @@ const typeDefs = gql`
   }
 
   type Query {
-    "Login User"
-    loginUser(loginInput: LoginInput): User
+    # "Login User"
+    # loginUser(loginInput: LoginInput): User
 
     "Send Reset Password Email"
     sendResetPasswordEmail(email: String!): Message
@@ -44,6 +44,9 @@ const typeDefs = gql`
   type Mutation {
     "Register User"
     registerUser(registerInput: RegisterInput): User
+
+    "Login User"
+    loginUser(loginInput: LoginInput): User
 
     "Reset Password"
     resetPassword(resetPasswordInput: ResetPasswordInput): User
