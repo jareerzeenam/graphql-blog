@@ -48,8 +48,8 @@ const typeDefs = gql`
     "Reset Password"
     resetPassword(resetPasswordInput: ResetPasswordInput): User
 
-    "Logout User"
-    logoutUser(logoutInput: LogoutInput): Message
+    # "Logout User"
+    # logoutUser(logoutInput: LogoutInput): Message
   }
 `;
 
