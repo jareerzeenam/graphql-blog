@@ -42,7 +42,7 @@ const typeDefs = gql`
     getAllBlogs(paginate: PaginationInput, sort: SortInput): BlogList
 
     "Get single blog by ID - Authorization Token Required"
-    showBlog(blogId: String!): Blog
+    showBlog(id: String!): Blog
 
     "Show blogs belongs to the logged user"
     showMyBlogs(paginate: PaginationInput, sort: SortInput): BlogList

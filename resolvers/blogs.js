@@ -18,11 +18,8 @@ const blogs = {
         sort,
       }),
 
-    showBlog: async (_, { blogId }, req) => {
-      if (!req.isAuth) throw new Error('Unauthenticated!');
-
-      return showBlog(blogId);
-    },
+    showBlog: async (_, id, { isAuth, userId }) =>
+      showBlog({ ...id, isAuth, userId }),
 
     showMyBlogs: (_, { paginate, sort }, { isAuth, userId }) =>
       showMyBlogs({ paginate, sort, isAuth, userId }),
@@ -35,11 +32,9 @@ const blogs = {
     updateBlog: async (_, { id, blog }, { isAuth, userId }) =>
       updateBlog({ id, ...blog, isAuth, userId }),
 
-    deleteBlog: async (_, blogId, { isAuth, userId }) =>
-      deleteBlog({ ...blogId, isAuth, userId }),
+    deleteBlog: async (_, blogId, { isAuth, userId, userRoles }) =>
+      deleteBlog({ ...blogId, isAuth, userId, userRoles }),
   },
 };
 
 module.exports = blogs;
-
-// TODO :: Unit test required for above Queries and Mutations (Out of scope)

@@ -1,8 +1,9 @@
 // registerUser
 const { User } = require('../models/User.model');
-const { ApolloError } = require('apollo-server-errors');
+const { ForbiddenError } = require('apollo-server-errors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const Validator = require('../utils/validator');
 const ValidationError = require('../errors/ValidationError');
 
@@ -47,9 +48,8 @@ const registerUser = async (payload) => {
 
   //   Throw error if that user exists
   if (oldUser) {
-    throw new ApolloError(
-      `A user is already registered with the email ${email}`,
-      'USER_ALREADY_EXISTS'
+    throw new ForbiddenError(
+      `A user is already registered with the email of ${email} please try a different email.`
     );
   }
 
@@ -95,9 +95,8 @@ const loginUser = async (payload) => {
 
   //   Throw error if that user does not exists
   if (!user) {
-    throw new ApolloError(
-      `User does not exist with the given email of ${email}`,
-      'USER_DOES_NOT_EXISTS'
+    throw new ForbiddenError(
+      `User does not exist with the given email of ${email}`
     );
   }
 
@@ -124,12 +123,103 @@ const loginUser = async (payload) => {
     };
   } else {
     // If user doesn't exist, return error
-    throw new ApolloError('Incorrect Password', 'INCORRECT_PASSWORD');
+    throw new ForbiddenError('Incorrect Credentials!');
   }
 };
+
+const sendResetPasswordEmail = async (email) => {
+  const token = await generateResetToken(email);
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    auth: {
+      user: process.env.MAIL_USERNAME,
+      pass: process.env.MAIL_PASSWORD,
+    },
+  });
+  const resetUrl = `https://example.com/reset-password?email=${email}&token=${token}`;
+  const mailOptions = {
+    from: process.env.MAIL_FROM_ADDRESS,
+    to: email,
+    subject: 'Reset your password',
+    html: `Click <a href="${resetUrl}">here</a> to reset your password 
+    <br><hr>
+    Email : ${email}
+    <br>
+    Token : ${token}
+    <br><hr>
+    `,
+  };
+  await transporter.sendMail(mailOptions);
+
+  return {
+    message: 'Email Sent',
+  };
+};
+
+const resetPassword = async (payload) => {
+  // TODO :: Validate payload inputs and add password and confirm password fields
+  const email = payload.email;
+  const token = payload.token;
+  const newPassword = payload.newPassword;
+
+  const user = await User.findOne({ email, resetToken: token });
+
+  if (!user || user.resetTokenExpires < Date.now()) {
+    throw new Error('Invalid or expired token');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  user.resetToken = null;
+  user.resetTokenExpires = null;
+  await user.save();
+
+  // generate a new JWT token for the user
+  const { id } = user;
+  const tokenPayload = { id };
+  const tokenOptions = { expiresIn: '1h' };
+  const jwtToken = jwt.sign(
+    tokenPayload,
+    process.env.JWT_HASH_TOKEN_KEY,
+    tokenOptions
+  );
+
+  return user;
+};
+
+// Function to generate Reset Token JWT
+async function generateResetToken(email) {
+  const user = await User.findOne({ email });
+
+  // TODO :: Check when is the last reset email was sent and send the second one (valid time within 1hr)
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const tokenPayload = { id: user.id };
+  const tokenOptions = { expiresIn: '1h' };
+
+  const jwtToken = jwt.sign(
+    tokenPayload,
+    process.env.JWT_HASH_TOKEN_KEY,
+    tokenOptions
+  );
+
+  // Update user reset token fields
+  user.resetToken = jwtToken;
+  user.resetTokenExpires = Date.now() + 3600000; // 1 hour
+  await user.save();
+
+  return jwtToken;
+}
 
 module.exports = {
   validateUserInput,
   registerUser,
   loginUser,
+  sendResetPasswordEmail,
+  resetPassword,
 };

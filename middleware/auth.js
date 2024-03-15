@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const { getUserRoles } = require('../directives/authDirective');
 
-const auth = (req) => {
+const auth = async (req) => {
   const authHeader = req.get('Authorization'); // e.g., "Bearer user-1"
 
   // check if decoded token is set
@@ -35,9 +36,13 @@ const auth = (req) => {
   // Is Authenticated user
   const isAuth = true;
 
+  // Get user roles from DB
+  const userRoles = await getUserRoles({ userId });
+
   return {
     userId,
     isAuth,
+    userRoles,
   };
 };
 

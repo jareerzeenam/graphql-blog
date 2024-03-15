@@ -9,6 +9,10 @@ const typeDefs = gql`
     token: String
   }
 
+  type Message {
+    message: String
+  }
+
   "Register from inputs"
   input RegisterInput {
     username: String
@@ -22,14 +26,30 @@ const typeDefs = gql`
     password: String
   }
 
+  "Reset Password inputs"
+  input ResetPasswordInput {
+    email: String
+    token: String
+    newPassword: String
+  }
+
   type Query {
-    "Login User"
-    loginUser(loginInput: LoginInput): User
+    "Send Reset Password Email"
+    sendResetPasswordEmail(email: String!): Message
   }
 
   type Mutation {
     "Register User"
     registerUser(registerInput: RegisterInput): User
+
+    "Login User"
+    loginUser(loginInput: LoginInput): User
+
+    "Reset Password"
+    resetPassword(resetPasswordInput: ResetPasswordInput): User
+
+    # "Logout User"
+    # logoutUser(logoutInput: LogoutInput): Message
   }
 `;
 
