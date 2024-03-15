@@ -1,7 +1,10 @@
 const ValidationError = require('../errors/ValidationError');
 const BlogRepository = require('../repositories/blog-repository');
 const Validator = require('../utils/validator');
-const { ForbiddenError, AuthenticationError } = require('apollo-server-errors');
+const {
+  ForbiddenError,
+  AuthenticationError,
+} = require('apollo-server-errors');
 
 /**
  * Validate the payload for Blog.
@@ -175,8 +178,11 @@ const deleteBlog = async (payload) => {
 
   if (!blog) throw new ValidationError('Blog Not Found!');
 
-  // Check if the blog belongs to the user before deleting
-  if (blog.author != payload.userId)
+  // Check if the User is an Admin and if the blog belongs to the user before deleting
+  if (
+    !payload.userRoles.includes('Admin') &&
+    blog.author != payload.userId
+  )
     throw new ForbiddenError('This blog does not belongs to you!');
 
   const response = await blogRepository.delete(payload.id);

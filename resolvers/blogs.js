@@ -32,8 +32,8 @@ const blogs = {
     updateBlog: async (_, { id, blog }, { isAuth, userId }) =>
       updateBlog({ id, ...blog, isAuth, userId }),
 
-    deleteBlog: async (_, blogId, { isAuth, userId }) =>
-      deleteBlog({ ...blogId, isAuth, userId }),
+    deleteBlog: async (_, blogId, { isAuth, userId, userRoles }) =>
+      deleteBlog({ ...blogId, isAuth, userId, userRoles }),
   },
 };
 
