@@ -7,7 +7,13 @@ const {
 const { UserInputError } = require('apollo-server-errors');
 const ValidationError = require('./errors/ValidationError');
 const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
+const http = require('http');
+const cors = require('cors');
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
+const {
+  ApolloServerPluginDrainHttpServer,
+} = require('@apollo/server/plugin/drainHttpServer');
 const { prefix } = require('./config/graphql');
 const typeDefs = require('./typeDefs/index');
 const resolvers = require('./resolvers/index');
@@ -40,6 +46,7 @@ schema = wrapSchema({
 
 async function startServer() {
   const app = express();
+  const httpServer = http.createServer(app);
 
   const apolloServer = new ApolloServer({
     schema,
@@ -64,25 +71,31 @@ async function startServer() {
       // be manipulated in other ways, as long as it's returned.
       return err;
     },
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
   await apolloServer.start();
 
-  // graphql (/graphql)
-  apolloServer.applyMiddleware({ app: app });
+  // express middleware
+  // app.use((req, res) => {
+  //   res.send('Hello from express apollo server');
+  // });
 
-  //express middleware
-  app.use((req, res) => {
-    res.send('Hello from express apollo server');
-  });
+  app.use(
+    '/graphql',
+    cors(),
+    express.json(),
+    expressMiddleware(apolloServer, {
+      context: async ({ req }) => ({ token: req.headers.token }),
+    })
+  );
 
   // Connect to DB
   connectDB();
 
-  app.listen(config.PORT, () =>
-    console.log(
-      `Server Started at http://localhost:${config.PORT}/graphql 🚀`
-    )
+  await new Promise(
+    (resolve) => httpServer.listen(config.PORT, resolve),
+    console.log(`http://localhost:${config.PORT}/graphql  🚀`)
   );
 }
 

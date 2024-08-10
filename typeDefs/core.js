@@ -1,6 +1,4 @@
-const { gql } = require('apollo-server-express');
-
-const typeDefs = gql`
+const typeDefs = `#graphql
   "Auth directive for permissions and roles"
   directive @auth(
     "Authorization to check if the requested user has the correct role/roles to access specific schema"
