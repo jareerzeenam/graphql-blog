@@ -50,13 +50,6 @@ async function startServer() {
 
   const apolloServer = new ApolloServer({
     schema,
-    context: ({ req }) => {
-      // Authentication middleware
-      const isAuth = auth(req);
-
-      // Returns {isAuth: bool, userId:Int}
-      return isAuth;
-    },
 
     formatError: (err) => {
       // Convert ValidationError to UserInputError
@@ -86,7 +79,13 @@ async function startServer() {
     cors(),
     express.json(),
     expressMiddleware(apolloServer, {
-      context: async ({ req }) => ({ token: req.headers.token }),
+      context: async ({ req }) => {
+        // Authentication middleware
+        const isAuth = auth(req);
+
+        // Returns {isAuth: bool, userId:Int}
+        return isAuth;
+      },
     })
   );
 
