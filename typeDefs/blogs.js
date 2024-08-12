@@ -1,6 +1,4 @@
-const { gql } = require('apollo-server-express');
-
-const typeDefs = gql`
+const typeDefs = `#graphql
   "Pagination Inputs"
   input PaginationInput {
     offset: Int!
