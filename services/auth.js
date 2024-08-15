@@ -1,5 +1,4 @@
 // registerUser
-const { User } = require('../models/User.model');
 const { ForbiddenError } = require('apollo-server-errors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -138,10 +137,12 @@ const resetPassword = async (payload) => {
   const token = payload.token;
   const newPassword = payload.newPassword;
 
-  const user = await User.findOne({ email, resetToken: token });
+  const userRepo = new UserRepository();
+  const user = await userRepo.findByEmail(email);
 
   if (
     !user ||
+    user.resetToken !== token ||
     moment(user.resetTokenExpires) < moment().subtract(1, 'hour')
   ) {
     throw new Error('Invalid or expired token');
@@ -169,14 +170,15 @@ const resetPassword = async (payload) => {
 
 // Function to generate Reset Token JWT
 async function generateResetToken(email) {
-  const user = await User.findOne({ email });
+  const userRepo = new UserRepository();
+  const user = await userRepo.findByEmail(email);
 
   if (!user) {
     throw new Error('User not found');
   }
 
   if (user.resetTokenExpires) {
-    const resetTokenExpires = moment(tokenExpires);
+    const resetTokenExpires = moment(user.resetTokenExpires);
     const tokenHasExpired = resetTokenExpires.isBefore(
       moment().subtract(1, 'hour')
     );
