@@ -29,6 +29,7 @@
     "graphql": "^16.9.0",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.30.1",
     "mongodb-memory-server": "^8.12.2",
     "mongoose": "^7.0.3",
     "nodemailer": "^6.9.1",

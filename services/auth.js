@@ -3,22 +3,34 @@ const { User } = require('../models/User.model');
 const { ForbiddenError } = require('apollo-server-errors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const moment = require('moment');
 const Validator = require('../utils/validator');
 const ValidationError = require('../errors/ValidationError');
+const UserRepository = require('../repositories/user-repository');
+const { sendEmail } = require('./email');
 
-const validateUserInput = ({ username, email, password }) => {
+const validateUserInput = (
+  { username, email, password },
+  context = 'register'
+) => {
+  const rules = {
+    username: 'required|string',
+    email: 'required|email',
+    password: 'required',
+  };
+
+  // Modify rules for login
+  if (context === 'login') {
+    delete rules.username;
+  }
+
   const validation = new Validator(
     {
       username,
       email,
       password,
     },
-    {
-      username: 'required',
-      email: 'required|email',
-      password: 'required',
-    }
+    rules
   );
 
   validation.setAttributeNames({
@@ -39,59 +51,32 @@ const registerUser = async (payload) => {
   // Validate Use Input
   validateUserInput(payload);
 
-  const username = payload.username;
-  const email = payload.email;
-  const password = payload.password;
-
   //   See if an old user is exists with email attempting to register
-  const oldUser = await User.findOne({ email });
+  const userRepo = new UserRepository();
+  const userExists = await userRepo.findByEmail(payload.email);
 
   //   Throw error if that user exists
-  if (oldUser) {
+  if (userExists) {
     throw new ForbiddenError(
-      `A user is already registered with the email of ${email} please try a different email.`
+      `A user is already registered with the email of ${payload.email} please try a different email.`
     );
   }
 
-  // Encrypt Password
-  var encryptedPassword = await bcrypt.hash(password, 10);
+  const newUser = await userRepo.create(payload);
 
-  // Build out the mongoose model
-  const newUser = new User({
-    username: username,
-    email: email.toLowerCase(),
-    password: encryptedPassword,
-  });
-
-  // Create our JWT (attach to user model)
-  const token = jwt.sign(
-    {
-      user_id: newUser._id,
-      email,
-    },
-    process.env.JWT_HASH_TOKEN_KEY,
-    {
-      expiresIn: '2h',
-    }
-  );
-  newUser.token = token;
-
-  // Save user to MongoDB
-  const res = await newUser.save(); // TODO :: Move save to user repository
-  return {
-    id: res.id,
-    ...res._doc,
-  };
+  return newUser;
 };
 
 const loginUser = async (payload) => {
-  // TODO :: Validate payload
+  // Validate Use Input
+  validateUserInput(payload, 'login');
 
   const email = payload.email;
   const password = payload.password;
 
   // See first if the user exist with the email
-  const user = await User.findOne({ email }); // TODO :: Move find to user repository
+  const userRepo = new UserRepository();
+  const user = await userRepo.findByEmail(payload.email);
 
   //   Throw error if that user does not exists
   if (!user) {
@@ -130,28 +115,17 @@ const loginUser = async (payload) => {
 const sendResetPasswordEmail = async (email) => {
   const token = await generateResetToken(email);
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
-    auth: {
-      user: process.env.MAIL_USERNAME,
-      pass: process.env.MAIL_PASSWORD,
-    },
-  });
+  const subject = 'Reset your password';
   const resetUrl = `https://example.com/reset-password?email=${email}&token=${token}`;
-  const mailOptions = {
-    from: process.env.MAIL_FROM_ADDRESS,
-    to: email,
-    subject: 'Reset your password',
-    html: `Click <a href="${resetUrl}">here</a> to reset your password 
-    <br><hr>
-    Email : ${email}
-    <br>
-    Token : ${token}
-    <br><hr>
-    `,
-  };
-  await transporter.sendMail(mailOptions);
+  const content = `
+  <p>Click <a href="${resetUrl}">here</a> to reset your password.</p>
+  <br><hr>
+  <p>Email: ${email}</p>
+  <p>Token: ${token}</p>
+  <br><hr>
+`;
+
+  await sendEmail(email, subject, content);
 
   return {
     message: 'Email Sent',
@@ -166,7 +140,10 @@ const resetPassword = async (payload) => {
 
   const user = await User.findOne({ email, resetToken: token });
 
-  if (!user || user.resetTokenExpires < Date.now()) {
+  if (
+    !user ||
+    moment(user.resetTokenExpires) < moment().subtract(1, 'hour')
+  ) {
     throw new Error('Invalid or expired token');
   }
 
@@ -194,9 +171,21 @@ const resetPassword = async (payload) => {
 async function generateResetToken(email) {
   const user = await User.findOne({ email });
 
-  // TODO :: Check when is the last reset email was sent and send the second one (valid time within 1hr)
   if (!user) {
     throw new Error('User not found');
+  }
+
+  if (user.resetTokenExpires) {
+    const resetTokenExpires = moment(tokenExpires);
+    const tokenHasExpired = resetTokenExpires.isBefore(
+      moment().subtract(1, 'hour')
+    );
+
+    if (!tokenHasExpired) {
+      throw new Error(
+        'An email has already been sent. Please check your email.'
+      );
+    }
   }
 
   const tokenPayload = { id: user.id };
@@ -210,7 +199,7 @@ async function generateResetToken(email) {
 
   // Update user reset token fields
   user.resetToken = jwtToken;
-  user.resetTokenExpires = Date.now() + 3600000; // 1 hour
+  user.resetTokenExpires = moment().add(1, 'hour'); // 1 hour
   await user.save();
 
   return jwtToken;
